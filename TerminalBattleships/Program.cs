@@ -15,6 +15,34 @@ namespace TerminalBattleships
 		{
 			while (Console.KeyAvailable) Console.ReadKey(true);
 		}
+		public static bool MakeDiscreteChoice()
+		{
+			Console.ForegroundColor = ConsoleColor.White;
+			int left = Console.CursorLeft, top = Console.CursorTop;
+			Console.Write("[Y|N]");
+			bool yes;
+			while (true)
+			{
+				switch (Console.ReadKey(true).Key)
+				{
+					case ConsoleKey.Y:
+						Console.SetCursorPosition(left + 1, top);
+						yes = true;
+						break;
+					case ConsoleKey.N:
+						Console.SetCursorPosition(left + 3, top);
+						yes = false;
+						break;
+					default: continue;
+				}
+				Console.ForegroundColor = ConsoleColor.Black;
+				Console.BackgroundColor = ConsoleColor.White;
+				Console.Write(yes ? "Y" : "N");
+				Console.BackgroundColor = ConsoleColor.Black;
+				Console.ForegroundColor = ConsoleColor.White;
+				return yes;
+			}
+		}
 
 		static void Main(string[] args)
 		{
@@ -123,8 +151,8 @@ namespace TerminalBattleships
 			Console.CursorVisible = true;
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.SetCursorPosition(0, 0);
-			Console.Write("Play new game? [Y|N] ");
-			bool yes = Console.ReadKey().Key == ConsoleKey.Y;
+			Console.Write("Play new game? ");
+			bool yes = MakeDiscreteChoice();
 			Console.WriteLine();
 			return yes;
 		}

@@ -27,8 +27,8 @@ namespace TerminalBattleships.VC
 
 		private bool IsServerDialog()
 		{
-			Console.Write("Are you server? [Y|N] ");
-			bool isServer = Console.ReadKey().Key == ConsoleKey.Y;
+			Console.Write("Are you server? ");
+			bool isServer = Program.MakeDiscreteChoice();
 			Console.WriteLine();
 			return isServer;
 		}
@@ -41,13 +41,40 @@ namespace TerminalBattleships.VC
 		}
 		private void ClientStartingDialog()
 		{
-			Console.Write("Enter server ip: ");
-			string strIP = Console.ReadLine();
-			if (strIP.Length == 0) strIP = "127.0.0.1";
-			var ip = IPAddress.Parse(strIP);
-			Console.Write("Enter server port: ");
-			ushort port = ushort.Parse(Console.ReadLine());
+			IPAddress ip = ReadServerIP();
+			ushort port = ReadServerPort();
 			Net = NetMember.StartClient(new IPEndPoint(ip, port));
+		}
+		private IPAddress ReadServerIP()
+		{
+			Console.Write("Enter server ip: ");
+			int left = Console.CursorLeft, top = Console.CursorTop;
+			while (true)
+			{
+				string strIP = Console.ReadLine();
+				if (strIP.Length == 0) strIP = "127.0.0.1";
+				if (IPAddress.TryParse(strIP, out IPAddress ip))
+				{
+					Console.SetCursorPosition(left, top);
+					Console.WriteLine(ip);
+					return ip;
+				}
+				Console.Write("Invalid input. Reenter: ");
+				left = Console.CursorLeft;
+				top = Console.CursorTop;
+			}
+		}
+		private ushort ReadServerPort()
+		{
+			Console.Write("Enter server port: ");
+			int left = Console.CursorLeft, top = Console.CursorTop;
+			while (true)
+			{
+				if (ushort.TryParse(Console.ReadLine(), out ushort port)) return port;
+				Console.Write("Invalid input. Reenter: ");
+				left = Console.CursorLeft;
+				top = Console.CursorTop;
+			}
 		}
 	}
 }
