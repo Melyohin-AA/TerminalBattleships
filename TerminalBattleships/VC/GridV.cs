@@ -45,7 +45,7 @@ namespace TerminalBattleships.VC
 				Console.BackgroundColor = LabelFColor;
 			}
 			else Console.ForegroundColor = LabelFColor;
-			Console.Write(IsOwn ? "OWN" : "FOE");
+			Console.Write(IsOwn ? "YOU" : "FOE");
 			Console.BackgroundColor = ConsoleColor.Black;
 		}
 

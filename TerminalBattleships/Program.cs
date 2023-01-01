@@ -10,6 +10,7 @@ namespace TerminalBattleships
 		private static Model.Game game;
 		private static VC.GridV ownGridV, foeGridV;
 		private static VC.PlayerFleetReadyMessage ownFleetReadyMessage, foeFleetReadyMessage;
+		private static VC.ControlInstructionsMessage controlInstructionsMessage;
 
 		public static void DisposeKeys()
 		{
@@ -60,6 +61,7 @@ namespace TerminalBattleships
 				Console.ReadKey(true);
 				return;
 			}
+			controlInstructionsMessage = new VC.ControlInstructionsMessage(0, 0);
 			while (true)
 			{
 				GameSessionInteraction();
@@ -81,7 +83,9 @@ namespace TerminalBattleships
 			foeGridV = new VC.GridV(24, 2, game.FoeGrid, false);
 			ownGridV.DrawAll();
 			foeGridV.DrawAll();
+			controlInstructionsMessage.Show(VC.ControlInstructionsMessage.Situation.FleetBuilding);
 			new VC.FleetBuildingDialog(game, ownGridV).Show();
+			controlInstructionsMessage.Hide(VC.ControlInstructionsMessage.Situation.FleetBuilding);
 			Console.CursorVisible = false;
 			ownFleetReadyMessage = new VC.PlayerFleetReadyMessage(ownGridV);
 			ownFleetReadyMessage.Show();
@@ -95,11 +99,18 @@ namespace TerminalBattleships
 			{
 				if (game.IsOwnTurn)
 				{
+					controlInstructionsMessage.Show(VC.ControlInstructionsMessage.Situation.OwnTurn);
 					Console.CursorVisible = true;
 					new VC.OwnTurnDialog(net, game, ownGridV, foeGridV).Show();
 					Console.CursorVisible = false;
+					controlInstructionsMessage.Hide(VC.ControlInstructionsMessage.Situation.OwnTurn);
 				}
-				else new VC.FoeTurnMonolog(net, game, ownGridV, foeGridV).Show();
+				else
+				{
+					controlInstructionsMessage.Show(VC.ControlInstructionsMessage.Situation.FoeTurn);
+					new VC.FoeTurnMonolog(net, game, ownGridV, foeGridV).Show();
+					controlInstructionsMessage.Hide(VC.ControlInstructionsMessage.Situation.FoeTurn);
+				}
 			}
 			bool victory = game.OwnIntactShipCount > 0;
 			game.EndPlayingStage();
