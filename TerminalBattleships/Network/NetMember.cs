@@ -20,9 +20,6 @@ namespace TerminalBattleships.Network
 		public NetworkStream Stream => client.GetStream();
 		public int Available => client.Available;
 
-		public event Action ConnectionFailedEvent;
-		public event Action ConnectedEvent;
-
 		private NetMember(TcpListener listener)
 		{
 			IsServer = true;
@@ -36,12 +33,9 @@ namespace TerminalBattleships.Network
 			this.serverEP = serverEP;
 		}
 
-		public void Connect()
+		public void ConnectAsServer(Action handshakeFailureHandler)
 		{
-			Task.Run(IsServer ? (Action)ServerConnectionFunc : (Action)ClientConnectionFunc);
-		}
-		private void ServerConnectionFunc()
-		{
+			if (!IsServer) throw new InvalidOperationException();
 			while (client == null)
 			{
 				if (!listener.Pending())
@@ -54,26 +48,22 @@ namespace TerminalBattleships.Network
 				{
 					this.client = client;
 					Connected = true;
-					ConnectedEvent?.Invoke();
 					return;
 				}
-				else ConnectionFailedEvent?.Invoke();
+				else handshakeFailureHandler?.Invoke();
 			}
 		}
-		private void ClientConnectionFunc()
+		public bool ConnectAsClient()
 		{
-			var task = client.ConnectAsync(serverEP.Address, serverEP.Port);
-			Task.WaitAll(task);
-			if (!TryHandshakeAsClient())
-			{
-				client.Close();
-				ConnectionFailedEvent?.Invoke();
-			}
-			else
+			if (IsServer) throw new InvalidOperationException();
+			client.Connect(serverEP.Address, serverEP.Port);
+			if (TryHandshakeAsClient())
 			{
 				Connected = true;
-				ConnectedEvent?.Invoke();
+				return true;
 			}
+			client.Close();
+			return false;
 		}
 
 		public static NetMember StartServer(ushort port = 0)
@@ -118,6 +108,17 @@ namespace TerminalBattleships.Network
 					Thread.Sleep(5);
 				handler();
 			});
+		}
+
+		public byte ReadByte()
+		{
+			int b = Stream.ReadByte();
+			if (b == -1)
+			{
+				Disconnect();
+				throw new SocketException();
+			}
+			return (byte)b;
 		}
 	}
 }

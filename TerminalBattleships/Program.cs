@@ -47,10 +47,19 @@ namespace TerminalBattleships
 		static void Main(string[] args)
 		{
 			InitConsole();
+			PrintShipSets();
 			var connectionDialog = new VC.ConnectionDialog();
 			connectionDialog.Show();
 			net = connectionDialog.Net;
-			while (!net.Connected) Thread.Sleep(5);
+			Console.Write("Ship sets argeement . . . ");
+			if (new Network.ShipSetsAgreement(net).TryAgree())
+				Console.WriteLine("Done");
+			else
+			{
+				Console.WriteLine("Failed");
+				Console.ReadKey(true);
+				return;
+			}
 			while (true)
 			{
 				GameSessionInteraction();
@@ -120,6 +129,15 @@ namespace TerminalBattleships
 			Console.CursorVisible = true;
 			Console.WriteLine();
 			Console.ReadKey(true);
+		}
+
+		private static void PrintShipSets()
+		{
+			Console.Write("Fleet:");
+			var shipSets = Model.Fleet.MakeShipSets();
+			foreach (var set in shipSets)
+				Console.Write($" #{set.Rank}x{set.RequiredCount}");
+			Console.WriteLine();
 		}
 
 		private static void KeySharingMessage()

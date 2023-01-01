@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using TerminalBattleships.Model;
 
 namespace TerminalBattleships.Network
@@ -19,9 +18,8 @@ namespace TerminalBattleships.Network
 		{
 			while (net.Available == 0)
 				System.Threading.Thread.Sleep(5);
-			int request = net.Stream.ReadByte();
-			if (request == -1) throw new SocketException();
-			target = new Coord((byte)request);
+			byte request = net.ReadByte();
+			target = new Coord(request);
 			fireResult = shotHandler(target);
 			net.Stream.WriteByte((byte)fireResult);
 			net.Stream.Flush();

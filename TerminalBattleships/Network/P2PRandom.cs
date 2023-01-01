@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Security.Cryptography;
 
 namespace TerminalBattleships.Network
@@ -27,13 +26,7 @@ namespace TerminalBattleships.Network
 			{
 				net.Stream.WriteByte(ownNumber[i]);
 				net.Stream.Flush();
-				int foeByte = net.Stream.ReadByte();
-				if (foeByte == -1)
-				{
-					net.Disconnect();
-					throw new SocketException();
-				}
-				foeNumber[i] = (byte)foeByte;
+				foeNumber[i] = net.ReadByte();
 			}
 			var encryptor = SHA512.Create();
 			ownNumber = encryptor.ComputeHash(ownNumber);

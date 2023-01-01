@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using TerminalBattleships.Model;
 
 namespace TerminalBattleships.Network
@@ -17,8 +16,7 @@ namespace TerminalBattleships.Network
 		{
 			net.Stream.WriteByte(target.IJ);
 			net.Stream.Flush();
-			int response = net.Stream.ReadByte();
-			if (response == -1) throw new SocketException();
+			byte response = net.ReadByte();
 			return (FireResult)response;
 		}
 	}

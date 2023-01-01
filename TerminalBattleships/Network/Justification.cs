@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Sockets;
 using TerminalBattleships.Model;
 
 namespace TerminalBattleships.Network
@@ -59,12 +58,7 @@ namespace TerminalBattleships.Network
 		}
 		public void ReceiveFoeShipEncryptedCoords()
 		{
-			int count = net.Stream.ReadByte();
-			if (count == -1)
-			{
-				net.Disconnect();
-				throw new SocketException();
-			}
+			byte count = net.ReadByte();
 			FoeShipEncryptedCoords = new EncryptedCoord[count];
 			for (short i = 0; i < count; i++)
 				FoeShipEncryptedCoords[i] = new EncryptedCoord(net.Stream);
@@ -78,12 +72,7 @@ namespace TerminalBattleships.Network
 		}
 		public void ReceiveFoeShipOpenCoords()
 		{
-			int count = net.Stream.ReadByte();
-			if (count == -1)
-			{
-				net.Disconnect();
-				throw new SocketException();
-			}
+			byte count = net.ReadByte();
 			var buffer = new byte[count];
 			net.Stream.Read(buffer, 0, count);
 			FoeShipOpenCoords = buffer.Select(ij => new Coord(ij)).ToArray();

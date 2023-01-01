@@ -15,14 +15,17 @@ namespace TerminalBattleships.VC
 				ServerStartingDialog();
 			else ClientStartingDialog();
 			Console.Write("Connecting . . . ");
-			Net.ConnectedEvent += () => Console.WriteLine("Done");
-			Net.ConnectionFailedEvent += () =>
+			if (isServer)
+				Net.ConnectAsServer(() => Console.Write("!"));
+			else
 			{
-				if (isServer)
-					Console.Write("!");
-				else Console.WriteLine("Failed");
-			};
-			Net.Connect();
+				if (!Net.ConnectAsClient())
+				{
+					Console.WriteLine("Handshake failed");
+					throw new Exception("Can do nothing with handshake failure...");
+				}
+			}
+			Console.WriteLine("Done");
 		}
 
 		private bool IsServerDialog()
@@ -39,6 +42,7 @@ namespace TerminalBattleships.VC
 			string port = Net.LocalEP.ToString().Substring("127.0.0.1:".Length);
 			Console.WriteLine($"Port: {port}");
 		}
+
 		private void ClientStartingDialog()
 		{
 			IPAddress ip = ReadServerIP();

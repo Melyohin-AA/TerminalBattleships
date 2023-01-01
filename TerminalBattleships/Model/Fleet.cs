@@ -1,25 +1,52 @@
 ﻿using System;
+using System.IO;
 
 namespace TerminalBattleships.Model
 {
 	public class Fleet
 	{
+		private const string configFilePath = "fleet.txt";
+
 		public Grid Grid { get; }
 		public RankedSet[] RankedSetShips { get; }
 		public byte ShipCount { get; private set; }
 		public bool CorrectStructers { get; private set; }
 
+		private static readonly byte[] fleetConfig;
+
+		static Fleet()
+		{
+			if (File.Exists(configFilePath))
+			{
+				string[] lines = File.ReadAllLines(configFilePath, System.Text.Encoding.UTF8);
+				try
+				{
+					fleetConfig = new byte[byte.Parse(lines[0])];
+					for (short i = 1; i < lines.Length; i++)
+						fleetConfig[i - 1] = byte.Parse(lines[i]);
+				}
+				catch (Exception)
+				{
+					goto rewrite;
+				}
+				return;
+			}
+			rewrite:
+			fleetConfig = new byte[5] { 1, 3, 5, 3, 1 };
+			File.WriteAllText(configFilePath, "5\n1\n3\n5\n3\n1\n", System.Text.Encoding.UTF8);
+		}
+
 		public Fleet(Grid grid)
 		{
 			Grid = grid ?? throw new ArgumentNullException(nameof(grid));
-			RankedSetShips = new[]
-			{
-				new RankedSet(1, 1),
-				new RankedSet(2, 3),
-				new RankedSet(3, 5),
-				new RankedSet(4, 3),
-				new RankedSet(5, 1),
-			};
+			RankedSetShips = MakeShipSets();
+		}
+		public static RankedSet[] MakeShipSets()
+		{
+			var shipSets = new RankedSet[fleetConfig.Length];
+			for (short i = 0; i < fleetConfig.Length; i++)
+				shipSets[i] = new RankedSet((byte)(i + 1), fleetConfig[i]);
+			return shipSets;
 		}
 
 		public void Scan()
