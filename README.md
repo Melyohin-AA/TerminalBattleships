@@ -26,7 +26,7 @@ The product is a Peer-to-peer application which allows a pair of people to play 
 
 ### Usage
 
-1. Compile build of the `TerminalBattleships` project via Visual Studio compiler (*OR* download [latest build](https://drive.google.com/file/d/1MpjXgecObgjblvgnCL0Mi5pIOH9QFdcg/view?usp=sharing))
+1. Compile build of the `TerminalBattleships` project via Visual Studio compiler (*OR* download [the latest build](https://drive.google.com/file/d/1MpjXgecObgjblvgnCL0Mi5pIOH9QFdcg/view?usp=sharing))
 2. Run `TerminalBattleships.exe`
 3. Connect with another peer
 4. Play the game
