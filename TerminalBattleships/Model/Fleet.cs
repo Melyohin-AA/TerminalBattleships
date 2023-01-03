@@ -34,8 +34,8 @@ namespace TerminalBattleships.Model
 				{
 					WriteConfigToFile();
 				}
-				return;
 			}
+			else WriteConfigToFile();
 		}
 		public static void WriteConfigToFile()
 		{

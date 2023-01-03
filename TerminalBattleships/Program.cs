@@ -144,6 +144,7 @@ namespace TerminalBattleships
 
 		private static void PrintShipSets()
 		{
+			Model.Fleet.ReadConfigFromFile();
 			Console.Write("Fleet:");
 			var shipSets = Model.Fleet.MakeShipSets();
 			foreach (var set in shipSets)
