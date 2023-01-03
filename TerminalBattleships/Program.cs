@@ -160,8 +160,8 @@ namespace TerminalBattleships
 		private static void DetWhoIsFirstMessage()
 		{
 			Console.Write("Determining who is first . . . ");
-			var random = new Network.P2PRandom(new Random());
-			random.Generate(net);
+			var random = new Network.P2PRandom(net, new Random());
+			random.Generate();
 			game.DetIsFirstTurnOwn(random.Number, net.IsServer);
 			Console.WriteLine("Done");
 			Console.WriteLine($"\tYou are " + (game.IsOwnTurn ? "FIRST" : "SECOND"));

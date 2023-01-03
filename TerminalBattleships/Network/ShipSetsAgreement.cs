@@ -5,9 +5,9 @@ namespace TerminalBattleships.Network
 {
 	public class ShipSetsAgreement
 	{
-		private NetMember net;
+		private readonly INetMember net;
 
-		public ShipSetsAgreement(NetMember net)
+		public ShipSetsAgreement(INetMember net)
 		{
 			this.net = net ?? throw new ArgumentNullException(nameof(net));
 		}

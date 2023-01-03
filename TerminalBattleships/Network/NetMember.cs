@@ -6,7 +6,23 @@ using System.Threading.Tasks;
 
 namespace TerminalBattleships.Network
 {
-	public class NetMember
+	public interface INetMember
+	{
+		bool Connected { get; }
+		bool IsServer { get; }
+		EndPoint LocalEP { get; }
+		NetworkStream Stream { get; }
+		int Available { get; }
+
+		void ConnectAsServer(Action handshakeFailureHandler);
+		bool ConnectAsClient();
+
+		void Disconnect();
+
+		void AddHook(Action handler);
+	}
+
+	public class NetMember : INetMember
 	{
 		private const byte serverHandshakeCode = 144, clientHandshakeCode = 169;
 
@@ -108,17 +124,6 @@ namespace TerminalBattleships.Network
 					Thread.Sleep(5);
 				handler();
 			});
-		}
-
-		public byte ReadByte()
-		{
-			int b = Stream.ReadByte();
-			if (b == -1)
-			{
-				Disconnect();
-				throw new SocketException();
-			}
-			return (byte)b;
 		}
 	}
 }

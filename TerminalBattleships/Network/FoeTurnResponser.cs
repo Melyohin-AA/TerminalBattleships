@@ -5,10 +5,10 @@ namespace TerminalBattleships.Network
 {
 	public class FoeTurnResponser
 	{
-		private NetMember net;
-		private Func<Coord, FireResult> shotHandler;
+		private readonly INetMember net;
+		private readonly Func<Coord, FireResult> shotHandler;
 
-		public FoeTurnResponser(NetMember net, Func<Coord, FireResult> shotHandler)
+		public FoeTurnResponser(INetMember net, Func<Coord, FireResult> shotHandler)
 		{
 			this.net = net ?? throw new ArgumentNullException(nameof(net));
 			this.shotHandler = shotHandler ?? throw new ArgumentNullException(nameof(shotHandler));

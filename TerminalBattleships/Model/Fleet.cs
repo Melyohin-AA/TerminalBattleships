@@ -5,35 +5,58 @@ namespace TerminalBattleships.Model
 {
 	public class Fleet
 	{
-		private const string configFilePath = "fleet.txt";
+		public const string ConfigFilePath = "fleet.txt";
 
 		public Grid Grid { get; }
 		public RankedSet[] RankedSetShips { get; }
 		public byte ShipCount { get; private set; }
 		public bool CorrectStructers { get; private set; }
 
-		private static readonly byte[] fleetConfig;
-
-		static Fleet()
+		private static byte[] config = new byte[5] { 1, 3, 5, 3, 1 };
+		
+		public static void ReadConfigFromFile()
 		{
-			if (File.Exists(configFilePath))
+			if (File.Exists(ConfigFilePath))
 			{
-				string[] lines = File.ReadAllLines(configFilePath, System.Text.Encoding.UTF8);
+				string[] lines = File.ReadAllLines(ConfigFilePath, System.Text.Encoding.UTF8);
 				try
 				{
-					fleetConfig = new byte[byte.Parse(lines[0])];
+					config = new byte[byte.Parse(lines[0])];
+					if (lines.Length > 16)
+					{
+						WriteConfigToFile();
+						return;
+					}
 					for (short i = 1; i < lines.Length; i++)
-						fleetConfig[i - 1] = byte.Parse(lines[i]);
+						config[i - 1] = byte.Parse(lines[i]);
 				}
 				catch (Exception)
 				{
-					goto rewrite;
+					WriteConfigToFile();
 				}
 				return;
 			}
-			rewrite:
-			fleetConfig = new byte[5] { 1, 3, 5, 3, 1 };
-			File.WriteAllText(configFilePath, "5\n1\n3\n5\n3\n1\n", System.Text.Encoding.UTF8);
+		}
+		public static void WriteConfigToFile()
+		{
+			var lines = new System.Collections.Generic.List<string>(config.Length + 1);
+			lines.Add(config.Length.ToString());
+			foreach (byte rankedShipRequiredCount in config)
+				lines.Add(rankedShipRequiredCount.ToString());
+			File.WriteAllLines(ConfigFilePath, lines, System.Text.Encoding.UTF8);
+		}
+
+		public static void SetConfig(byte[] config)
+		{
+			if (config.Length > 16) throw new ArgumentOutOfRangeException(nameof(config));
+			Fleet.config = (byte[])config.Clone();
+		}
+		public static RankedSet[] MakeShipSets()
+		{
+			var shipSets = new RankedSet[config.Length];
+			for (short i = 0; i < config.Length; i++)
+				shipSets[i] = new RankedSet((byte)(i + 1), config[i]);
+			return shipSets;
 		}
 
 		public Fleet(Grid grid)
@@ -41,14 +64,7 @@ namespace TerminalBattleships.Model
 			Grid = grid ?? throw new ArgumentNullException(nameof(grid));
 			RankedSetShips = MakeShipSets();
 		}
-		public static RankedSet[] MakeShipSets()
-		{
-			var shipSets = new RankedSet[fleetConfig.Length];
-			for (short i = 0; i < fleetConfig.Length; i++)
-				shipSets[i] = new RankedSet((byte)(i + 1), fleetConfig[i]);
-			return shipSets;
-		}
-
+		
 		public void Scan()
 		{
 			CorrectStructers = true;
@@ -84,7 +100,11 @@ namespace TerminalBattleships.Model
 				}
 				if (vertical)
 				{
-					byte size = DetShipSizeDown(coord, checkedTiles);
+					if (!TryDetShipSizeDown(coord, checkedTiles, out byte size))
+					{
+						CorrectStructers = false;
+						continue;
+					}
 					if (upShip) size++;
 					if (size <= RankedSetShips.Length)
 						RankedSetShips[size - 1].CurrentCount++;
@@ -93,7 +113,11 @@ namespace TerminalBattleships.Model
 				}
 				if (horizontal)
 				{
-					byte size = DetShipSizeRight(coord, checkedTiles);
+					if (!TryDetShipSizeRight(coord, checkedTiles, out byte size))
+					{
+						CorrectStructers = false;
+						continue;
+					}
 					if (leftShip) size++;
 					if (size <= RankedSetShips.Length)
 						RankedSetShips[size - 1].CurrentCount++;
@@ -160,31 +184,35 @@ namespace TerminalBattleships.Model
 			else rightShip = false;
 		}
 
-		private byte DetShipSizeDown(Coord origin, bool[] checkedTiles)
+		private bool TryDetShipSizeDown(Coord origin, bool[] checkedTiles, out byte size)
 		{
-			byte size = 0;
+			size = 0;
 			for (byte i = origin.I; i < 16; i++)
 			{
 				var coord = new Coord(i, origin.J);
 				checkedTiles[coord.IJ] = true;
 				if (!Grid[coord].IsShip()) break;
 				CheckForXCollisions(coord);
+				if (((origin.J > 0) && Grid[i, (byte)(origin.J - 1)].IsShip()) ||
+					((origin.J < 15) && Grid[i, (byte)(origin.J + 1)].IsShip())) return false;
 				size++;
 			}
-			return size;
+			return true;
 		}
-		private byte DetShipSizeRight(Coord origin, bool[] checkedTiles)
+		private bool TryDetShipSizeRight(Coord origin, bool[] checkedTiles, out byte size)
 		{
-			byte size = 0;
+			size = 0;
 			for (byte j = origin.J; j < 16; j++)
 			{
 				var coord = new Coord(origin.I, j);
 				checkedTiles[coord.IJ] = true;
 				if (!Grid[coord].IsShip()) break;
 				CheckForXCollisions(coord);
+				if (((origin.I > 0) && Grid[(byte)(origin.I - 1), j].IsShip()) ||
+					((origin.I < 15) && Grid[(byte)(origin.I + 1), j].IsShip())) return false;
 				size++;
 			}
-			return size;
+			return true;
 		}
 
 		private void CountShips()

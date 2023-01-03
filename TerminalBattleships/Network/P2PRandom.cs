@@ -7,16 +7,18 @@ namespace TerminalBattleships.Network
 	{
 		public const byte HashSize = Justification.HashSize;
 
-		private Random random;
+		private readonly INetMember net;
+		private readonly Random random;
 		
 		public byte[] Number { get; } = new byte[HashSize];
 
-		public P2PRandom(Random random)
+		public P2PRandom(INetMember net, Random random)
 		{
+			this.net = net ?? throw new ArgumentNullException(nameof(net));
 			this.random = random ?? throw new ArgumentNullException(nameof(random));
 		}
 
-		public void Generate(NetMember net)
+		public void Generate()
 		{
 			if (net.IsServer) random.NextBytes(Number);
 			var ownNumber = new byte[HashSize];

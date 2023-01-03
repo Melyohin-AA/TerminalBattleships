@@ -8,7 +8,7 @@ namespace TerminalBattleships.Network
 	{
 		public const byte HashSize = 64;
 
-		private readonly NetMember net;
+		private readonly INetMember net;
 
 		public byte[] OwnPublicKey { get; private set; }
 		public byte[] OwnPrivateKey { get; private set; }
@@ -20,7 +20,7 @@ namespace TerminalBattleships.Network
 		public Coord[] FoeShipOpenCoords { get; private set; }
 		public EncryptedCoord[] FoeShipEncryptedCoords { get; private set; }
 
-		public Justification(NetMember net, Random random)
+		public Justification(INetMember net, Random random)
 		{
 			this.net = net ?? throw new ArgumentNullException(nameof(net));
 			OwnPrivateKey = new byte[HashSize];

@@ -5,9 +5,9 @@ namespace TerminalBattleships.Network
 {
 	public class OwnTurnRequester
 	{
-		private NetMember net;
+		private readonly INetMember net;
 
-		public OwnTurnRequester(NetMember net)
+		public OwnTurnRequester(INetMember net)
 		{
 			this.net = net ?? throw new ArgumentNullException(nameof(net));
 		}

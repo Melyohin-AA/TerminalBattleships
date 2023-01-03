@@ -59,6 +59,7 @@
     <Compile Include="Network\FoeTurnResponser.cs" />
     <Compile Include="Network\Justification.cs" />
     <Compile Include="Network\NetMember.cs" />
+    <Compile Include="Network\NetMemberExtension.cs" />
     <Compile Include="Network\OwnTurnRequester.cs" />
     <Compile Include="Network\P2PRandom.cs" />
     <Compile Include="Network\ShipSetsAgreement.cs" />
