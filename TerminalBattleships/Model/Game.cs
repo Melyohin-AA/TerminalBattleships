@@ -25,6 +25,7 @@ namespace TerminalBattleships.Model
 
 		public GameStage Stage { get; private set; }
 		public bool IsOwnTurn { get; private set; }
+		public bool IsFirstTurnDetermined { get; private set; }
 
 		public Game()
 		{
@@ -34,13 +35,15 @@ namespace TerminalBattleships.Model
 
 		public void EndFleetBuildingStage()
 		{
-			if (!((Stage == GameStage.BuildingFleet) && FoeFleetCompleted && OwnFleetCompleted))
+			if (!((Stage == GameStage.BuildingFleet) &&
+				FoeFleetCompleted && OwnFleetCompleted && IsFirstTurnDetermined))
 				throw new InvalidOperationException();
 			Stage = GameStage.Playing;
 		}
 		public void EndPlayingStage()
 		{
-			if ((OwnIntactShipCount > 0) && (FoeIntactShipCount > 0)) throw new InvalidOperationException();
+			if ((Stage != GameStage.Playing) || ((OwnIntactShipCount > 0) && (FoeIntactShipCount > 0)))
+				throw new InvalidOperationException();
 			Stage = GameStage.Over;
 		}
 
@@ -49,16 +52,9 @@ namespace TerminalBattleships.Model
 			if ((Stage != GameStage.BuildingFleet) || OwnFleetCompleted) throw new InvalidOperationException();
 			var fleet = new Fleet(OwnGrid);
 			fleet.Scan();
-			if (!IsFleetComplete(fleet)) return false;
+			if (!fleet.IsComplete) return false;
 			OwnFleetCompleted = true;
 			OwnIntactShipCount = FoeIntactShipCount = fleet.ShipCount;
-			return true;
-		}
-		public static bool IsFleetComplete(Fleet fleet)
-		{
-			if (!fleet.CorrectStructers) return false;
-			foreach (Fleet.RankedSet set in fleet.RankedSetShips)
-				if (set.CurrentCount != set.RequiredCount) return false;
 			return true;
 		}
 		public void ResetOwnFleetCompletedFlag()
@@ -177,6 +173,7 @@ namespace TerminalBattleships.Model
 
 		public void DetIsFirstTurnOwn(byte[] hash, bool isServer)
 		{
+			if ((Stage != GameStage.BuildingFleet) || IsFirstTurnDetermined) throw new InvalidOperationException();
 			byte xhash = 0;
 			foreach (byte b in hash)
 				xhash ^= b;
@@ -184,6 +181,7 @@ namespace TerminalBattleships.Model
 			xhash = (byte)((xhash >> 2) ^ (xhash & 0x03));
 			xhash = (byte)((xhash >> 1) ^ (xhash & 0x01));
 			IsOwnTurn = (xhash == 1) == isServer;
+			IsFirstTurnDetermined = true;
 		}
 	}
 }

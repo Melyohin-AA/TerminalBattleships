@@ -78,9 +78,11 @@ namespace TerminalBattleships_Testing.Model
 			return (random.Next(2) == 0) ? GridTile.IntactShip : GridTile.DamagedShip;
 		}
 
-		private void VerifyScanResult(Fleet fleet, bool correctnessStructureExpected, byte shipCountExpected,
+		private void VerifyScanResult(Fleet fleet, bool completenessExpected,
+			bool correctnessStructureExpected, byte shipCountExpected,
 			byte[] requiredCountExpected, byte[] currentCountExpected)
 		{
+			Assert.AreEqual(completenessExpected, fleet.IsComplete);
 			Assert.AreEqual(correctnessStructureExpected, fleet.CorrectStructers);
 			Assert.AreEqual(shipCountExpected, fleet.ShipCount);
 			for (byte i = 0; i < fleet.RankedSetShips.Length; i++)
@@ -112,7 +114,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(3, grid, 12, 0);// ###.... 12
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, true, 39, config, config);
+			VerifyScanResult(fleet, true, true, 39, config, config);
 		}
 		[TestMethod]
 		public void Scan_Valid_VerticalShips()
@@ -135,7 +137,7 @@ namespace TerminalBattleships_Testing.Model
 			SetDownRankedShip(3, grid, 0, 12);// ###.... 12
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, true, 39, config, config);
+			VerifyScanResult(fleet, true, true, 39, config, config);
 		}
 		[TestMethod]
 		public void Scan_InvalidFleetComposition_Disbalance()
@@ -159,7 +161,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(3, grid, 12, 0);// ###.... 12
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, true, 39, config, current);
+			VerifyScanResult(fleet, false, true, 39, config, current);
 		}
 		[TestMethod]
 		public void Scan_InvalidFleetComposition_Lack()
@@ -182,7 +184,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(3, grid, 10, 4);
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, true, 36, config, current);
+			VerifyScanResult(fleet, false, true, 36, config, current);
 		}
 		[TestMethod]
 		public void Scan_InvalidFleetComposition_Excess()
@@ -207,7 +209,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(1, grid, 12, 4);
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, true, 40, config, current);
+			VerifyScanResult(fleet, false, true, 40, config, current);
 		}
 		[TestMethod]
 		public void Scan_InvalidStructure_XCollision_ToLeftDown()
@@ -219,7 +221,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(1, grid, 1, 2);// ..# 1
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, false, 3, config, config);
+			VerifyScanResult(fleet, false, false, 3, config, config);
 		}
 		[TestMethod]
 		public void Scan_InvalidStructure_XCollision_ToLeftUp()
@@ -231,7 +233,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(2, grid, 1, 0);// ##. 1
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, false, 3, config, config);
+			VerifyScanResult(fleet, false, false, 3, config, config);
 		}
 		[TestMethod]
 		public void Scan_InvalidStructure_Nonlinear()
@@ -244,7 +246,7 @@ namespace TerminalBattleships_Testing.Model
 			SetRightRankedShip(2, grid, 1, 0);// ## 1
 			var fleet = new Fleet(grid);
 			fleet.Scan();
-			VerifyScanResult(fleet, false, 3, config, current);
+			VerifyScanResult(fleet, false, false, 3, config, current);
 		}
 	}
 }

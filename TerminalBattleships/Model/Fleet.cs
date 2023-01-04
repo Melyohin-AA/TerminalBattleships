@@ -11,6 +11,7 @@ namespace TerminalBattleships.Model
 		public RankedSet[] RankedSetShips { get; }
 		public byte ShipCount { get; private set; }
 		public bool CorrectStructers { get; private set; }
+		public bool IsComplete { get; private set; }
 
 		private static byte[] config = new byte[5] { 1, 3, 5, 3, 1 };
 		
@@ -127,6 +128,7 @@ namespace TerminalBattleships.Model
 				throw new Exception();
 			}
 			CountShips();
+			DetIfIsComplete();
 		}
 
 		private void CheckForXCollisions(Coord coord)
@@ -221,6 +223,16 @@ namespace TerminalBattleships.Model
 			foreach (GridTile tile in Grid.Tiles)
 				if (tile.IsShip())
 					ShipCount++;
+		}
+
+		private void DetIfIsComplete()
+		{
+			IsComplete = false;
+			if (!CorrectStructers) return;
+			foreach (RankedSet set in RankedSetShips)
+				if (set.CurrentCount != set.RequiredCount) return;
+			IsComplete = true;
+			return;
 		}
 
 		public struct RankedSet

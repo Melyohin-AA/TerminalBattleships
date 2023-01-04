@@ -73,7 +73,7 @@ namespace TerminalBattleships.VC
 				Console.Write(set.CurrentCount);
 			}
 			Console.SetCursorPosition(gridV.GridX + 1, Console.CursorTop + 1);
-			if (Game.IsFleetComplete(fleet))
+			if (fleet.IsComplete)
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
 				Console.Write('o');

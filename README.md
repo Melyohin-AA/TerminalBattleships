@@ -1,5 +1,5 @@
 <div align="center">
-  <p align="right">v[1.4.3.1]</p>
+  <p align="right">v[1.4.3.2]</p>
   <h2 align="center">Terminal Battleships</h2>
   <p align="center">Play Battleships via network</p>
 </div>
