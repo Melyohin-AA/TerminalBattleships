@@ -94,7 +94,7 @@ namespace TerminalBattleships.Network
 			for (short i = 0; i < FoeShipOpenCoords.Length; i++)
 			{
 				var ec = new EncryptedCoord(FoeShipOpenCoords[i], FoePublicKey, FoePrivateKey);
-				if (ec != FoeShipEncryptedCoords[i]) return true;
+				if (!ec.Equals(FoeShipEncryptedCoords[i])) return true;
 			}
 			return false;
 		}

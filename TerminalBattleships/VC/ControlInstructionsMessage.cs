@@ -5,8 +5,8 @@ namespace TerminalBattleships.VC
 	public class ControlInstructionsMessage
 	{
 		private static readonly string[] messages = new string[] {
-			"[Arrows:move cursor|X:set ship|Z:complete]",
-			"[Arrows:move cursor|X:fire]",
+			"[Arrows:move cursor|Z:set ship|X:complete]",
+			"[Arrows:move cursor|Z:fire]",
 			"Just wait and receive shots!",
 		};
 

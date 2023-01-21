@@ -30,7 +30,11 @@ namespace TerminalBattleships.Network
 		public EncryptedCoord(Stream stream)
 		{
 			Hash = new byte[HashSize];
-			stream.Read(Hash, 0, HashSize);
+			int i = 0;
+			do
+			{
+				i += stream.Read(Hash, i, HashSize - i);
+			} while (i < HashSize);
 		}
 		public void Write(Stream stream)
 		{
@@ -39,8 +43,12 @@ namespace TerminalBattleships.Network
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is EncryptedCoord)) return false;
-			return ((EncryptedCoord)obj) == this;
+			var other = obj as EncryptedCoord;
+			if (other == null) return false;
+			for (byte i = 0; i < HashSize; i++)
+				if (Hash[i] != other.Hash[i])
+					return false;
+			return true;
 		}
 		public override int GetHashCode()
 		{
@@ -57,18 +65,6 @@ namespace TerminalBattleships.Network
 				}
 			}
 			return hash32;
-		}
-
-		public static bool operator ==(EncryptedCoord a, EncryptedCoord b)
-		{
-			for (byte i = 0; i < HashSize; i++)
-				if (a.Hash[i] != b.Hash[i])
-					return false;
-			return true;
-		}
-		public static bool operator !=(EncryptedCoord a, EncryptedCoord b)
-		{
-			return !(a == b);
 		}
 	}
 }

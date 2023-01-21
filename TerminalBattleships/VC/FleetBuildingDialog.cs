@@ -20,7 +20,7 @@ namespace TerminalBattleships.VC
 			PrintShipSets();
 			gridC = new GridC(gridV.GridX, gridV.GridY);
 			while (!game.OwnFleetCompleted)
-				gridC.Control(CompleteFleetControl, SetShipControl);
+				gridC.Control(SetShipControl, CompleteFleetControl);
 		}
 		private void CompleteFleetControl()
 		{

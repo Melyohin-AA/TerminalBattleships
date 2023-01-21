@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace TerminalBattleships.Network
 		bool Connected { get; }
 		bool IsServer { get; }
 		EndPoint LocalEP { get; }
-		NetworkStream Stream { get; }
+		Stream Stream { get; }
 		int Available { get; }
 
 		void ConnectAsServer(Action handshakeFailureHandler);
@@ -33,7 +34,7 @@ namespace TerminalBattleships.Network
 		public bool Connected { get; private set; }
 		public bool IsServer { get; }
 		public EndPoint LocalEP => IsServer ? listener.LocalEndpoint : null;
-		public NetworkStream Stream => client.GetStream();
+		public Stream Stream => client.GetStream();
 		public int Available => client.Available;
 
 		private NetMember(TcpListener listener)
@@ -51,7 +52,7 @@ namespace TerminalBattleships.Network
 
 		public void ConnectAsServer(Action handshakeFailureHandler)
 		{
-			if (!IsServer) throw new InvalidOperationException();
+			if (!IsServer || Connected) throw new InvalidOperationException();
 			while (client == null)
 			{
 				if (!listener.Pending())
@@ -71,7 +72,7 @@ namespace TerminalBattleships.Network
 		}
 		public bool ConnectAsClient()
 		{
-			if (IsServer) throw new InvalidOperationException();
+			if (IsServer || Connected) throw new InvalidOperationException();
 			client.Connect(serverEP.Address, serverEP.Port);
 			if (TryHandshakeAsClient())
 			{
@@ -112,8 +113,10 @@ namespace TerminalBattleships.Network
 
 		public void Disconnect()
 		{
+			if (!Connected) throw new InvalidOperationException();
 			client.Close();
 			if (IsServer) listener.Stop();
+			Connected = false;
 		}
 
 		public void AddHook(Action handler)

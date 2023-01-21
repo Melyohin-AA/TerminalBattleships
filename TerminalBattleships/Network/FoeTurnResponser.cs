@@ -16,8 +16,6 @@ namespace TerminalBattleships.Network
 
 		public void ReceiveShot(out Coord target, out FireResult fireResult)
 		{
-			while (net.Available == 0)
-				System.Threading.Thread.Sleep(5);
 			byte request = net.ReadByte();
 			target = new Coord(request);
 			fireResult = shotHandler(target);

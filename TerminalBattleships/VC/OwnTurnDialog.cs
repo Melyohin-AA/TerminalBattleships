@@ -27,7 +27,7 @@ namespace TerminalBattleships.VC
 			foeGridC = new GridC(foeGridV.GridX, foeGridV.GridY);
 			while (game.IsOwnTurn && (game.FoeIntactShipCount > 0))
 			{
-				foeGridC.Control(null, FireControl);
+				foeGridC.Control(FireControl, null);
 				if (fireResult == FireResult.Error400) throw new Exception("!400!");
 			}
 			ownGridV.DrawLabel(false);

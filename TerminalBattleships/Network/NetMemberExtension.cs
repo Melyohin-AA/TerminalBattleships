@@ -7,13 +7,12 @@ namespace TerminalBattleships.Network
 	{
 		public static byte ReadByte(this INetMember net)
 		{
-			int b = net.Stream.ReadByte();
-			if (b == -1)
+			int read;
+			do
 			{
-				net.Disconnect();
-				throw new SocketException();
-			}
-			return (byte)b;
+				read = net.Stream.ReadByte();
+			} while (read == -1);
+			return (byte)read;
 		}
 	}
 }
