@@ -14,8 +14,9 @@ namespace TerminalBattleships_Testing.Network
 		public void Constructor_Valid()
 		{
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
-			Func<Coord, FireResult> shotHandler = c => {
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
+			Func<Coord, FireResult> shotHandler = c =>
+			{
 				failed = true;
 				return FireResult.Error400;
 			};
@@ -26,7 +27,8 @@ namespace TerminalBattleships_Testing.Network
 		public void Constructor_Invalid_NullNet()
 		{
 			bool failed = false;
-			Func<Coord, FireResult> shotHandler = c => {
+			Func<Coord, FireResult> shotHandler = c =>
+			{
 				failed = true;
 				return FireResult.Error400;
 			};
@@ -37,7 +39,7 @@ namespace TerminalBattleships_Testing.Network
 		public void Constructor_Invalid_NullShotHandler()
 		{
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			Assert.ThrowsException<ArgumentNullException>(() => new FoeTurnResponser(net, null));
 			Assert.IsFalse(failed);
 		}
@@ -47,7 +49,7 @@ namespace TerminalBattleships_Testing.Network
 		{
 			const byte targetIJ = 123;
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			Func<Coord, FireResult> shotHandler = c => FireResult.Miss;
 			var responser = new FoeTurnResponser(net, shotHandler);
 			bool requestSent = false;
@@ -67,7 +69,7 @@ namespace TerminalBattleships_Testing.Network
 		{
 			const byte targetIJ = 123;
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			Func<Coord, FireResult> shotHandler = c =>
 			{
 				if (targetIJ != c.IJ) failed = true;
@@ -85,7 +87,7 @@ namespace TerminalBattleships_Testing.Network
 			const byte targetIJ = 123;
 			bool failed = false;
 			const FireResult expectedFireResult = FireResult.Miss;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			Func<Coord, FireResult> shotHandler = c => expectedFireResult;
 			net.BackStream.WriteByte(targetIJ);
 			var responser = new FoeTurnResponser(net, shotHandler);

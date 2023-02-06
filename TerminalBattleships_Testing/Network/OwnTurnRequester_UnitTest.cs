@@ -14,7 +14,7 @@ namespace TerminalBattleships_Testing.Network
 		public void Constructor_Valid()
 		{
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			var requester = new OwnTurnRequester(net);
 			Assert.IsFalse(failed);
 		}
@@ -29,7 +29,7 @@ namespace TerminalBattleships_Testing.Network
 		{
 			const byte targetIJ = 123;
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			var requester = new OwnTurnRequester(net);
 			bool responseSent = false;
 			Task.Run(() =>
@@ -49,7 +49,7 @@ namespace TerminalBattleships_Testing.Network
 		{
 			const byte expectedTargetIJ = 123;
 			bool failed = false;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			var requester = new OwnTurnRequester(net);
 			Task.Run(() =>
 			{
@@ -68,7 +68,7 @@ namespace TerminalBattleships_Testing.Network
 			bool failed = false;
 			const FireResult expectedFireResult = FireResult.Miss;
 			FireResult actualFireResult;
-			MockNetMember net = MockNetMember.MakeConnected(() => failed = true);
+			FakeNetMember net = FakeNetMember.MakeConnected(() => failed = true);
 			var requester = new OwnTurnRequester(net);
 			Task.Run(() =>
 			{

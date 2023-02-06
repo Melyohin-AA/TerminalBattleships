@@ -11,8 +11,8 @@ namespace TerminalBattleships.Network
 		private readonly INetMember net;
 
 		public byte[] OwnPublicKey { get; private set; }
-		public byte[] OwnPrivateKey { get; private set; }
-		public byte[] FoePublicKey { get; private set; }
+		public byte[] OwnPrivateKey { get; }
+		public byte[] FoePublicKey { get; }
 		public byte[] FoePrivateKey { get; private set; }
 
 		public Coord[] OwnShipOpenCoords { get; private set; }
@@ -35,7 +35,8 @@ namespace TerminalBattleships.Network
 			net.Stream.Write(FoePublicKey, 0, HashSize);
 			net.Stream.Flush();
 			OwnPublicKey = new byte[HashSize];
-			net.Stream.Read(OwnPublicKey, 0, HashSize);
+			for (int i = 0; i < HashSize; )
+				i += net.Stream.Read(OwnPublicKey, i, HashSize - i);
 		}
 		public void SharePrivateKeys()
 		{
@@ -43,7 +44,8 @@ namespace TerminalBattleships.Network
 			net.Stream.Write(OwnPrivateKey, 0, HashSize);
 			net.Stream.Flush();
 			FoePrivateKey = new byte[HashSize];
-			net.Stream.Read(FoePrivateKey, 0, HashSize);
+			for (int i = 0; i < HashSize; )
+				i += net.Stream.Read(FoePrivateKey, i, HashSize - i);
 		}
 
 		public void SendOwnShipEncryptedCoords(Coord[] coords)
@@ -74,7 +76,8 @@ namespace TerminalBattleships.Network
 		{
 			byte count = net.ReadByte();
 			var buffer = new byte[count];
-			net.Stream.Read(buffer, 0, count);
+			for (int i = 0; i < count; )
+				i += net.Stream.Read(buffer, i, count - i);
 			FoeShipOpenCoords = buffer.Select(ij => new Coord(ij)).ToArray();
 		}
 

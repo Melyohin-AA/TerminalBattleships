@@ -3,12 +3,12 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using TerminalBattleships.Network;
 
 namespace TerminalBattleships_Testing.Network
 {
-	class MockNetMember : INetMember
+	class FakeNetMember : INetMember
 	{
 		public Func<bool> HandshakeHandler { get; set; }
 		public Action DisconnectionHandler { get; set; }
@@ -21,11 +21,16 @@ namespace TerminalBattleships_Testing.Network
 		public Stream Stream => FrontStream;
 		public int Available => FrontStream.Available;
 
-		public MockNetMember()
+		public FakeNetMember()
 		{
-			Queue<byte> a = new Queue<byte>(), b = new Queue<byte>();
+			ConcurrentQueue<byte> a = new ConcurrentQueue<byte>(), b = new ConcurrentQueue<byte>();
 			FrontStream = new ForkStream(a, b);
 			BackStream = new ForkStream(b, a);
+		}
+		public FakeNetMember(ForkStream frontStream, ForkStream backStream)
+		{
+			FrontStream = frontStream ?? throw new ArgumentNullException(nameof(frontStream));
+			BackStream = backStream ?? throw new ArgumentNullException(nameof(backStream));
 		}
 
 		public void ConnectAsServer(Action handshakeFailureHandler)
@@ -60,13 +65,23 @@ namespace TerminalBattleships_Testing.Network
 			});
 		}
 
-		public static MockNetMember MakeConnected(Action failHandler)
+		public static FakeNetMember MakeConnected(Action failHandler, ForkStream frontStream, ForkStream backStream)
 		{
-			return new MockNetMember {
-				Connected = true,
-				DisconnectionHandler = failHandler,
-				HandshakeHandler = () => { failHandler(); return false; },
-			};
+			var net = new FakeNetMember(frontStream, backStream);
+			SetupAsConnected(net, failHandler);
+			return net;
+		}
+		public static FakeNetMember MakeConnected(Action failHandler)
+		{
+			var net = new FakeNetMember();
+			SetupAsConnected(net, failHandler);
+			return net;
+		}
+		private static void SetupAsConnected(FakeNetMember net, Action failHandler)
+		{
+			net.Connected = true;
+			net.DisconnectionHandler = failHandler;
+			net.HandshakeHandler = () => { failHandler(); return false; };
 		}
 	}
 }

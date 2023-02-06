@@ -86,34 +86,22 @@ namespace TerminalBattleships_Testing.Network
 		}
 		[TestMethod]
 		[Timeout(1000)]
-		public void ReadConstructor_Invalid_DataPartitialDelay()
+		public void ReadConstructor_DataPartitialDelay()
 		{
 			var coord = new Coord(123);
-			Exception innerEx = null;
-			bool innerEnd = false;
 			byte[] publicKey = GetRandomKey(), privateKey = GetRandomKey();
 			var ec = new EncryptedCoord(coord, publicKey, privateKey);
 			var stream = new MemoryStream(EncryptedCoord.HashSize);
 			ec.Write(stream);
 			stream.Position = 1;
-			Task.Run(() => {
-				try
-				{
-					new EncryptedCoord(stream);
-					innerEnd = true;
-				}
-				catch (Exception ex)
-				{
-					innerEx = ex;
-				}
-			});
+			Task inner = Task.Run(() => new EncryptedCoord(stream));
 			while (stream.Position < stream.Length) Thread.Sleep(5);
-			if (innerEx != null) throw innerEx;
-			Assert.IsFalse(innerEnd);
+			if (inner.Exception != null) throw inner.Exception;
+			Assert.IsFalse(inner.IsCompleted);
 			stream.Position -= 1;
 			while (stream.Position < stream.Length) Thread.Sleep(5);
-			if (innerEx != null) throw innerEx;
-			Assert.IsTrue(innerEnd);
+			if (inner.Exception != null) throw inner.Exception;
+			Assert.IsTrue(inner.IsCompleted);
 		}
 
 		[TestMethod]

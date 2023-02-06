@@ -5,6 +5,7 @@ namespace TerminalBattleships
 {
 	class Program
 	{
+		private static Random random = new Random();
 		private static Network.NetMember net;
 		private static Network.Justification justification;
 		private static Model.Game game;
@@ -72,7 +73,7 @@ namespace TerminalBattleships
 		private static void GameSessionInteraction()
 		{
 			Console.CursorVisible = true;
-			justification = new Network.Justification(net, new Random());
+			justification = new Network.Justification(net, random);
 			KeySharingMessage();
 			game = new Model.Game();
 			DetWhoIsFirstMessage();

@@ -30,11 +30,8 @@ namespace TerminalBattleships.Network
 		public EncryptedCoord(Stream stream)
 		{
 			Hash = new byte[HashSize];
-			int i = 0;
-			do
-			{
+			for (int i = 0; i < HashSize; )
 				i += stream.Read(Hash, i, HashSize - i);
-			} while (i < HashSize);
 		}
 		public void Write(Stream stream)
 		{
